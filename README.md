@@ -23,9 +23,9 @@
 | Member     | Role      | Institution |
 | ---------- | --------- | ----------- |
 | **Sreekanth S** | Team Lead | Amrita Vishwa Vidyapeetham, Coimbatore   |
-| **Nethra Iyer** | [Role]    | [College]   |
-| **[Name]** | [Role]    | [College]   |
-| **[Name]** | [Role]    | [College]   |
+| **Nethra Iyer** | [Role]    | Amrita Vishwa Vidyapeetham, Coimbatore  |
+| **Lakshmi Harshita** | [Role]    | Amrita Vishwa Vidyapeetham, Coimbatore   |
+| **Midhun Chelat** | [Role]    | Amrita Vishwa Vidyapeetham, Coimbatore   |
 
 ---
 
