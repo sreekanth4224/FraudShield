@@ -2,7 +2,7 @@
   <img src="https://github.com/Runa8147/Hackathena_Readme_Template/blob/d0add823684f0ac28b76a99636c729f80b0ca8ff/hackathena_banner.png" alt="Hackathena '26 2.0" width="100%">
 </p>
 
-<h1 align="center">[PROJECT NAME]</h1>
+<h1 align="center">FraudShield</h1>
 
 <p align="center">
   <strong>[One-line description of your solution]</strong>
@@ -18,12 +18,12 @@
 
 ## 👥 Team
 
-**Team Name:** `[TEAM NAME]`
+**Team Name:** `n00bmasters`
 
 | Member     | Role      | Institution |
 | ---------- | --------- | ----------- |
-| **[Name]** | Team Lead | [College]   |
-| **[Name]** | [Role]    | [College]   |
+| **Sreekanth S** | Team Lead | Amrita Vishwa Vidyapeetham, Coimbatore   |
+| **Nethra Iyer** | [Role]    | [College]   |
 | **[Name]** | [Role]    | [College]   |
 | **[Name]** | [Role]    | [College]   |
 
