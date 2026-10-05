@@ -41,9 +41,9 @@ Deepfakes, cloned voices, synthetic images, fabricated documents, and other AI-a
 
 ## 💡 Solution
 
-### [PROJECT NAME]
+### FraudShield
 
-**[Project Name]** is a **[web/mobile/desktop/API]** solution designed to detect and/or prevent **[specific type of AI-based fraud]**.
+**FraudShield** is a **[web/mobile/desktop/API]** solution designed to detect and/or prevent **[specific type of AI-based fraud]**.
 
 The system takes **[input]**, analyzes it using **[AI/ML/algorithm/verification mechanism]**, and produces **[detection result/risk score/authenticity assessment/alert]** to help users identify potentially fraudulent content.
 
