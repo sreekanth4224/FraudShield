@@ -1,0 +1,9 @@
+*.log
+.env
+__pycache__/
+challenge_log.jsonl
+data/
+features/
+models/
+reports/
+venv/
