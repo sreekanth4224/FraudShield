@@ -203,30 +203,6 @@ venv\Scripts\python app.py --window full      # right (default) | left | full
 
 Screen capture needs a secure page: open it as `localhost`, not a LAN IP (use HTTPS for remote access).
 
-### Optional settings
-
-Set before `python app.py` (e.g. `set FRAUDSHIELD_SCENE=0` or `$env:FRAUDSHIELD_SCENE = "0"`):
-
-```env
-FRAUDSHIELD_FACE_MODELS=b0-ff++,b0-celeb      # add b5-ff++ for a more robust model (GPU)
-FRAUDSHIELD_SCENE=1                           # 0 disables the AI-generated-scene detector
-FRAUDSHIELD_ASR=openai/whisper-small          # speech model for the read-aloud challenge
-FRAUDSHIELD_CUSTOM=0                          # 1 enables our trained heads (see TRAINING.md)
-FRAUDSHIELD_FP32=0                            # 1 disables half precision on GPU
-FRAUDSHIELD_WINDOW=right                      # right | left | full
-```
-
-### Troubleshooting
-
-| Problem | Fix |
-|---|---|
-| `py -3.11` not found | Install Python 3.11 and tick *Add to PATH* |
-| `operator torchvision::nms does not exist` | Reinstall torch + torchvision from the same index |
-| **AI models** pill not green | Hover for the reason; usually weights weren't downloaded |
-| Share screen blocked | Use Chrome/Edge at `http://localhost:8000` |
-| No voice score | Tick *Also share tab/system audio* |
-| Port 8000 in use | `app.py --port 8080` |
-
 ### Using it
 
 1. Click **Share screen**: pick the call's browser tab (with tab audio, most private) or the entire screen (with system audio, for desktop apps).
