@@ -5,7 +5,7 @@
 <h1 align="center">FraudShield</h1>
 
 <p align="center">
-  <strong>Real-time deepfake detection for video KYC calls: face, voice and lip-sync forensics with live liveness challenges.</strong>
+  <strong>Real-time deepfake detection for live video calls (Video KYC, remote job interviews and online exams): face, voice and lip-sync forensics with live liveness challenges.</strong>
 </p>
 
 <p align="center">
@@ -23,19 +23,17 @@
 | Member     | Role      | Institution |
 | ---------- | --------- | ----------- |
 | **Sreekanth S** | Team Lead | Amrita Vishwa Vidyapeetham, Coimbatore   |
-| **Nethra Iyer** | [Role]    | Amrita Vishwa Vidyapeetham, Coimbatore  |
-| **Lakshmi Harshita** | [Role]    | Amrita Vishwa Vidyapeetham, Coimbatore   |
-| **Midhun Chelat** | [Role]    | Amrita Vishwa Vidyapeetham, Coimbatore   |
+| **Nethra Iyer** | Backend (Model)    | Amrita Vishwa Vidyapeetham, Coimbatore  |
+| **Lakshmi Harshita** | Backend (Server)    | Amrita Vishwa Vidyapeetham, Coimbatore   |
+| **Midhun Chelat** | Frontend (UI)    | Amrita Vishwa Vidyapeetham, Coimbatore   |
 
 ---
 
 ## 🎯 Problem Statement
 
-The rapid advancement of generative AI has made it increasingly difficult to distinguish authentic content from artificially generated or manipulated content.
+Generative AI makes it hard to tell real people from synthetic ones. Deepfakes and cloned voices enable **impersonation, identity theft, fraud and social engineering**.
 
-Deepfakes, cloned voices, synthetic images, fabricated documents, and other AI-assisted techniques can enable **impersonation, misinformation, identity theft, financial fraud, and social engineering attacks**.
-
-Banks and fintechs onboard customers through **video KYC calls**, where an officer verifies a person's identity over a live video call. Real-time face swaps, cloned voices, and replayed or photographed faces let a fraudster pass as someone else and open accounts in their name. The officer has only their eyes to tell a real face from a generated one.
+Identity is increasingly verified over live video: **Video KYC** for bank and fintech onboarding, **remote job interviews**, and **online exams**. Real-time face swaps, cloned voices and replayed or photographed faces let a fraudster pass as someone else, open accounts, get hired under a false identity, or sit an exam for another candidate. The reviewer (KYC officer, interviewer or proctor) has only their eyes to tell a real face from a generated one.
 
 ---
 
@@ -43,26 +41,26 @@ Banks and fintechs onboard customers through **video KYC calls**, where an offic
 
 ### FraudShield
 
-**FraudShield** is a **web dashboard backed by a local Python engine** that detects **deepfake and presentation attacks during live video KYC calls**.
+**FraudShield** is a **web dashboard backed by a local Python engine** that detects **deepfake and presentation attacks during live video calls**.
 
-The officer shares their screen (or just the call's browser tab) with FraudShield and runs the call as usual, in any conferencing app. FraudShield finds the customer's face in the call window and listens to the call audio. Trained deepfake detectors, liveness checks, a voice-clone detector and a lip-sync check feed a **deepfake-risk score that updates every second**, with a verdict, the evidence behind it and suggested challenges.
+The reviewer shares their screen (or just the call's browser tab) with FraudShield and runs the call as usual, in any conferencing or proctoring app. FraudShield finds the participant's face, listens to the call audio, and produces a **deepfake-risk score every second** with a verdict, evidence and suggested challenges.
 
 ### Key Features
 
-* 🔴 **Works with any video-call app**: screen or tab capture, so no integration with Zoom, Teams, Meet or the bank's KYC portal is needed.
-* ⚪ **Trained deepfake detectors**: an MS-EffGCViT-B0 ensemble (FaceForensics++ and Celeb-DF v2) on the face, a wav2vec2 voice-clone detector on the audio, and a ViT detector for fully AI-generated video.
-* ⚫ **Liveness and replay checks**: blinks, expression dynamics, 3-D parallax, remote pulse (rPPG), screen-recapture moiré, and lip-sync between mouth and voice.
-* 🔴 **Live liveness challenges**: "read this phrase aloud" (transcribed with Whisper and checked against lip movement), "wave a hand across the face" and "show a side profile", which break most real-time face swaps.
-* ⚪ **Explainable, exportable verdicts**: a live gauge, risk timeline and per-check evidence, a pop-out HUD that floats over the call, and a downloadable JSON evidence report.
+* 🔴 **Works with any video-call app**: screen or tab capture, no integration with Zoom, Teams, Meet, KYC portals or proctoring tools needed.
+* ⚪ **Trained deepfake detectors**: MS-EffGCViT-B0 ensemble (FaceForensics++, Celeb-DF v2) for faces, wav2vec2 for voice clones, a ViT for fully AI-generated video.
+* ⚫ **Liveness and replay checks**: blinks, expressions, 3-D parallax, remote pulse (rPPG), screen-recapture moiré, lip-sync.
+* 🔴 **Live liveness challenges**: read a phrase aloud (Whisper + lip check), wave a hand across the face, show a side profile.
+* ⚪ **Explainable, exportable verdicts**: live gauge, risk timeline, per-check evidence, pop-out HUD and JSON evidence report.
 
 ---
 
 ## 🔄 How It Works
 
 ```text
- Officer's browser                          FraudShield engine (Python, localhost)
- ─────────────────                          ──────────────────────────────────────
- getDisplayMedia (entire screen             FaceStream   find customer face on screen (tiled BlazeFace)
+ Reviewer's browser                         FraudShield engine (Python, localhost)
+ ──────────────────                         ──────────────────────────────────────
+ getDisplayMedia (entire screen             FaceStream   find participant face on screen (tiled BlazeFace)
    + system audio)                            │          → Face Mesh 478 landmarks on native pixels
    │                                          │          → trained deepfake detector (FF++ + Celeb-DF)
    │                                          │          → liveness checks over a rolling 20 s window
@@ -75,39 +73,34 @@ The officer shares their screen (or just the call's browser tab) with FraudShiel
    gauge · overlay · timeline · evidence                 verdict with hysteresis, events, challenges
 ```
 
-Evidence is split into two groups, scored separately (`modules/scoring.py`):
-
-- **Synthesis**: is the face or voice itself generated?
-- **Liveness**: is a live person in front of the camera, rather than a photo, a screen or a replay?
-
-A module's score is the **worse** of the two groups. A deepfake blinks, turns its head and moves its lips like a real person, so it passes every liveness check. Averaging those "clear" results with the synthesis evidence would let deepfakes through as genuine.
+Evidence is scored in two groups (`modules/scoring.py`): **Synthesis** (is the face/voice generated?) and **Liveness** (is a live person present, not a photo, screen or replay?). A module's score is the **worse** of the two, since a deepfake passes liveness checks and averaging would let it through.
 
 **Face** (`modules/face_module.py`)
 
 | Check | Group | Catches |
 |---|---|---|
-| **AI deepfake detector**: MS-EffGCViT-B0 × 2 (FaceForensics++ and Celeb-DF v2 checkpoints), 4 face crops/s | synthesis | face swaps, reenactment, neural textures |
-| **AI-generated scene detector** (CommunityForensics ViT) | synthesis | fully generated video (Sora / Veo / Kling style) |
-| Landmark jitter (residual after rigid alignment) | synthesis (minor) | frame-by-frame synthesised faces |
-| Face-swap seam (cheek vs. neck sensor noise) | synthesis (minor) | swapped faces blended onto a real head |
-| Face tracking / second face | liveness | face-swap dropouts, coached / assisted sessions |
-| Blink behaviour (rate, depth, left/right symmetry) | liveness | photos, replays |
+| **AI deepfake detector**: MS-EffGCViT-B0 × 2 (FF++, Celeb-DF v2), 4 crops/s | synthesis | face swaps, reenactment, neural textures |
+| **AI-generated scene detector** (CommunityForensics ViT) | synthesis | fully generated video (Sora / Veo / Kling) |
+| Landmark jitter | synthesis (minor) | frame-by-frame synthesised faces |
+| Face-swap seam (cheek vs. neck noise) | synthesis (minor) | swapped faces blended onto a real head |
+| Face tracking / second face | liveness | swap dropouts, coached or assisted sessions |
+| Blink behaviour | liveness | photos, replays |
 | Expression dynamics | liveness | photo, frozen or looped frame |
-| 3-D parallax (landmarks vs. a single homography) | liveness | flat photo / screen held to the camera |
-| Remote pulse / rPPG (POS on forehead + cheeks) | liveness | photos, replays |
-| Screen recapture (moiré peaks + glare) | liveness | a phone or monitor held up to the customer's camera |
+| 3-D parallax | liveness | flat photo / screen held to the camera |
+| Remote pulse / rPPG | liveness | photos, replays |
+| Screen recapture (moiré + glare) | liveness | phone or monitor held up to the camera |
 
-The two face checkpoints are combined by a small logistic stacker (`modules/calibration.py`). The detector's reliability falls with the face's *effective* resolution, so a blurry, upscaled low-bandwidth stream counts for less.
+The two checkpoints are combined by a logistic stacker (`modules/calibration.py`); low effective resolution lowers their weight.
 
-**Voice** (`modules/voice_module.py`): a trained **voice-clone detector** (wav2vec2-base fine-tuned on the In-the-Wild corpus) plus intonation, pitch micro-jitter, periodicity (HNR), rhythm & pauses and loudspeaker replay. Checks that conferencing apps break (digital silence, bandwidth, breathing) are reported as *not applicable* on call audio.
+**Voice** (`modules/voice_module.py`): wav2vec2 voice-clone detector (In-the-Wild corpus) plus intonation, pitch jitter, HNR, rhythm and loudspeaker-replay checks. Checks that call codecs break are marked *not applicable*.
 
-**Lip-sync** (`modules/avsync.py`): peak cross-correlation (±400 ms) between lip opening and the voice envelope, plus a hard alarm when a voice is heard but the lips don't move. This catches voice-overs, cloned voices played over a real or recorded face, and replays.
+**Lip-sync** (`modules/avsync.py`): lip–voice cross-correlation (±400 ms), plus an alarm when voice is heard but lips don't move.
 
-**Challenges** (`modules/challenge.py`): a random phrase to read aloud (Whisper transcription + lip-sync + reaction time), a hand passed across the face, and a side profile. A passed challenge pulls the score down; a failed one is pinned on the risk timeline.
+**Challenges** (`modules/challenge.py`): read-aloud phrase, hand across the face, side profile. Passing lowers the score; failing is pinned on the timeline.
 
-**Fusion** (`modules/fusion.py`): each check reports a risk, a weight and a reliability for the current window. Fusion is a confidence-weighted average in which one confident red module can't be averaged away. Risk rises fast and decays slowly.
+**Fusion** (`modules/fusion.py`): confidence-weighted average where one confident red module can't be averaged away. Risk rises fast and decays slowly.
 
-Verdicts: **Calibrating** (not enough evidence yet), **Likely genuine** (< 35), **Suspicious** (35–65, run a liveness challenge), **Likely deepfake** (≥ 65, stop and escalate).
+Verdicts: **Calibrating**, **Likely genuine** (< 35), **Suspicious** (35–65, run a challenge), **Likely deepfake** (≥ 65, stop and escalate).
 
 ---
 
@@ -119,10 +112,10 @@ Verdicts: **Calibrating** (not enough evidence yet), **Likely genuine** (< 35), 
 | -------------- | ---------------------------------------- |
 | **Frontend**   | HTML, CSS, vanilla JavaScript; Screen Capture API, Web Worker, AudioWorklet, Document Picture-in-Picture |
 | **Backend**    | Python 3.11, FastAPI, Uvicorn (WebSocket streaming) |
-| **AI / ML**    | PyTorch, timm, Hugging Face Transformers; MS-EffGCViT-B0 (FF++ / Celeb-DF v2), wav2vec2 voice-clone detector, CommunityForensics ViT, Whisper (ASR for challenges), MediaPipe BlazeFace + Face Mesh |
+| **AI / ML**    | PyTorch, timm, Hugging Face Transformers; MS-EffGCViT-B0, wav2vec2, CommunityForensics ViT, Whisper, MediaPipe BlazeFace + Face Mesh |
 | **Database**   | None: frames and audio are analysed in memory only |
 | **Processing** | OpenCV, NumPy, SciPy, librosa, soundfile |
-| **Deployment** | Runs locally on the officer's machine (`localhost`), CPU or NVIDIA GPU |
+| **Deployment** | Runs locally on the reviewer's machine (`localhost`), CPU or NVIDIA GPU |
 
 ### Tools
 
@@ -134,17 +127,17 @@ Verdicts: **Calibrating** (not enough evidence yet), **Likely genuine** (< 35), 
 
 ## 📊 Results
 
-`tools/evaluate.py` runs labelled clips through exactly the live pipeline. The sample is 69 public clips (66 with a trackable face): 35 from Google's DeepFakeDetection (DFD) set and 34 from Celeb-DF v2, about half real and half fake. Each clip is run at full resolution, as a 720p call (1280 px, JPEG q70) and as a poor 360p call (640 px, JPEG q40, upscaled).
+`tools/evaluate.py` runs labelled clips through the live pipeline: 69 public clips (35 DFD, 34 Celeb-DF v2, ~half fake), at full resolution, as a 720p call (JPEG q70) and as a 360p call (JPEG q40, upscaled).
 
-Face module with the shipped calibration (fitted on these same clips, so *in-sample*):
+Face module, shipped calibration (*in-sample*):
 
-| Video quality | Face score AUC | Fakes flagged *Likely deepfake* (≥ 65) | Genuine flagged ≥ 65 | Genuine flagged *Suspicious* (≥ 35) |
+| Video quality | Face score AUC | Fakes flagged ≥ 65 | Genuine flagged ≥ 65 | Genuine flagged ≥ 35 |
 |---|---|---|---|---|
 | Full resolution | 0.95 | 25 / 33 | 0 / 32 | 7 / 32 |
 | 720p call | 0.92 | 22 / 34 | 1 / 32 | 12 / 32 |
 | 360p call | 0.82 | 11 / 34 | 0 / 32 | 8 / 32 |
 
-Out-of-sample check (calibrate on one dataset, test on the other, full resolution):
+Out-of-sample (calibrate on one dataset, test on the other):
 
 | Tested on | Detector AUC | Fakes flagged ≥ 65 | Genuine flagged ≥ 65 |
 |---|---|---|---|
@@ -153,19 +146,18 @@ Out-of-sample check (calibrate on one dataset, test on the other, full resolutio
 
 | Metric                 | Result                                      |
 | ---------------------- | ------------------------------------------- |
-| **Face detector AUC**  | 0.95 full resolution · 0.92 at 720p · 0.82 at 360p |
 | **Voice clones**       | 0 false alarms on 25 genuine clips; 4 / 18 commercial clones flagged ≥ 65 |
-| **Response Time**      | Score updates every 1 s; frames analysed at 15 fps |
-| **Resource use**       | ~30 % of one CPU core (engine) + ~97 % (Chrome dashboard + capture) |
-| **Supported Input**    | Live screen / tab capture with system audio; video and audio files via `tools/` |
+| **Response Time**      | Score every 1 s; frames at 15 fps |
+| **Resource use**       | ~30 % of one CPU core (engine) + ~97 % (Chrome) |
+| **Supported Input**    | Live screen / tab capture with audio; files via `tools/` |
 
-What this shows:
+Takeaways:
 
-- **The trained detector is what catches deepfakes.** The forensic checks were near chance (AUC ≈ 0.5) at telling a deepfake from a real face; they matter for photo, screen and replay attacks.
-- **It degrades with bandwidth.** At 360p there is too little real detail in the face, so reliability drops and the dashboard asks the officer to have the customer move closer.
-- **Calibration is domain-specific.** Calibrate on recordings from your own KYC channel (see below).
-- **These numbers are a sanity check, not a certification.** 66 clips give wide error bars, and the Celeb-DF checkpoint may have seen some of these clips in training.
-- **Voice-clone detection is the weakest part.** A "clear" from the voice detector is treated as weak evidence; lip-sync and the read-aloud challenge are the main voice defences.
+- **The trained detector catches deepfakes**; forensic checks (AUC ≈ 0.5) matter for photo, screen and replay attacks.
+- **Accuracy drops with bandwidth**; at 360p the dashboard asks the participant to move closer.
+- **Calibration is domain-specific**; calibrate on recordings from your own channel.
+- **A sanity check, not a certification**: 66 clips give wide error bars.
+- **Voice-clone detection is the weakest part**; lip-sync and read-aloud are the main voice defences.
 
 ---
 
@@ -175,126 +167,84 @@ What this shows:
 
 * Windows with Python 3.11
 * Chrome or Edge
-* Optional: an NVIDIA GPU with CUDA
-* A few GB of disk for model weights (downloaded from Hugging Face into `./models`)
+* Optional: NVIDIA GPU with CUDA
+* A few GB of disk for model weights
 
 ### Setup tutorial (one time)
 
-Run these in **Command Prompt** or **PowerShell**.
-
-**1. Get the code**
+Run in **Command Prompt** or **PowerShell**:
 
 ```bash
 git clone https://github.com/sreekanth4224/FraudShield.git
 cd FraudShield
-```
-
-**2. Create a virtual environment**
-
-```bash
 py -3.11 -m venv venv
 venv\Scripts\python -m pip install --upgrade pip
-```
 
-**3. Install PyTorch** (pick one)
-
-```bash
-:: NVIDIA GPU (recommended, much faster)
+:: PyTorch: NVIDIA GPU (recommended)
 venv\Scripts\pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu124
-
-:: CPU only
+:: ...or CPU only
 venv\Scripts\pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-```
 
-Always install torch and torchvision **together from the same index**. A mismatched torchvision breaks the detectors (`operator torchvision::nms does not exist`).
-
-**4. Install the other dependencies**
-
-```bash
 venv\Scripts\pip install -r requirements.txt
+venv\Scripts\python -m tools.download_models     # weights into ./models
+venv\Scripts\python -m tools.diagnose            # optional: check models, GPU, webcam
 ```
 
-**5. Download the model weights** (into `./models`, a few minutes the first time)
-
-```bash
-venv\Scripts\python -m tools.download_models
-```
-
-**6. Check the setup** (optional: models, GPU and webcam)
-
-```bash
-venv\Scripts\python -m tools.diagnose
-```
+Install torch and torchvision **together from the same index**, or the detectors break.
 
 ### Run the app
 
 ```bash
-cd FraudShield
-venv\Scripts\python app.py
+venv\Scripts\python app.py                    # opens http://localhost:8000
+venv\Scripts\python app.py --port 8080        # another port
+venv\Scripts\python app.py --no-browser       # don't auto-open the dashboard
+venv\Scripts\python app.py --window full      # right (default) | left | full
 ```
 
-The dashboard opens automatically at **http://localhost:8000**. Stop the server with **Ctrl + C**.
-
-Useful options:
-
-```bash
-venv\Scripts\python app.py --port 8080          # use another port
-venv\Scripts\python app.py --no-browser         # don't open the dashboard automatically
-venv\Scripts\python app.py --window full        # dashboard window: right (default) | left | full
-```
-
-Screen capture only works on a secure page, so open the dashboard as `localhost` on the officer's own machine (not via a LAN IP). To reach it from another machine, put the server behind HTTPS.
+Screen capture needs a secure page: open it as `localhost`, not a LAN IP (use HTTPS for remote access).
 
 ### Optional settings
 
-No environment variables are required. To change a setting, set it before `python app.py`:
-
-```bash
-:: Command Prompt
-set FRAUDSHIELD_SCENE=0
-
-# PowerShell
-$env:FRAUDSHIELD_SCENE = "0"
-```
+Set before `python app.py` (e.g. `set FRAUDSHIELD_SCENE=0` or `$env:FRAUDSHIELD_SCENE = "0"`):
 
 ```env
-FRAUDSHIELD_FACE_MODELS=b0-ff++,b0-celeb      # add b5-ff++ for a more compression-robust face model (GPU recommended)
-FRAUDSHIELD_SCENE=1                           # 0 turns off the AI-generated-scene detector
+FRAUDSHIELD_FACE_MODELS=b0-ff++,b0-celeb      # add b5-ff++ for a more robust model (GPU)
+FRAUDSHIELD_SCENE=1                           # 0 disables the AI-generated-scene detector
 FRAUDSHIELD_ASR=openai/whisper-small          # speech model for the read-aloud challenge
-FRAUDSHIELD_CUSTOM=0                          # 1 enables our own trained heads (see TRAINING.md)
+FRAUDSHIELD_CUSTOM=0                          # 1 enables our trained heads (see TRAINING.md)
 FRAUDSHIELD_FP32=0                            # 1 disables half precision on GPU
-FRAUDSHIELD_WINDOW=right                      # dashboard window placement: right | left | full
+FRAUDSHIELD_WINDOW=right                      # right | left | full
 ```
 
 ### Troubleshooting
 
 | Problem | Fix |
 |---|---|
-| `py -3.11` not found | Install Python 3.11 from python.org and tick *Add to PATH* |
-| `operator torchvision::nms does not exist` | Reinstall torch and torchvision together from the same index (step 3) |
-| **AI models** pill is not green | Hover over it to see why; usually step 5 was skipped. The app still runs on the forensic checks alone |
-| Share screen does nothing / is blocked | Use Chrome or Edge and open `http://localhost:8000`, not an IP address |
-| No voice score | Tick *Also share tab audio* / *Also share system audio* when sharing |
-| Port 8000 already in use | `venv\Scripts\python app.py --port 8080` |
+| `py -3.11` not found | Install Python 3.11 and tick *Add to PATH* |
+| `operator torchvision::nms does not exist` | Reinstall torch + torchvision from the same index |
+| **AI models** pill not green | Hover for the reason; usually weights weren't downloaded |
+| Share screen blocked | Use Chrome/Edge at `http://localhost:8000` |
+| No voice score | Tick *Also share tab/system audio* |
+| Port 8000 in use | `app.py --port 8080` |
 
 ### Using it
 
-1. Click **Share screen** and pick either **the call's browser tab** with *Also share tab audio* ticked (most private), or **Entire screen** with *Also share system audio* ticked (for desktop apps like Zoom or Teams).
-2. Start or continue the video call. FraudShield locks onto the largest face on the screen and ignores the officer's small self-view. If several people are on screen, click **Select region** and drag a box around the customer's tile.
-3. Keep the dashboard on a second monitor or beside the call; it keeps analysing when the call window is in front. **Pop-out HUD** floats the score over the call.
+1. Click **Share screen**: pick the call's browser tab (with tab audio, most private) or the entire screen (with system audio, for desktop apps).
+2. Start the call. FraudShield locks onto the largest face; use **Select region** if several people are on screen.
+3. Keep the dashboard beside the call or use **Pop-out HUD** to float the score over it.
 4. Follow the **Suggested challenges** when evidence is missing or suspicious.
-5. **Report** downloads a JSON evidence report: verdict, every check, the risk timeline and the event log. **New customer** resets the session.
+5. **Report** downloads a JSON evidence report; **New customer** resets the session.
 
 ---
 
 ## 🧪 Example
 
-*Illustrative walk-through of the dashboard's output for a face-swap attempt.*
+*Illustrative output for a face-swap attempt.*
 
 **Input**
 
 ```text
-Live video KYC call shared from Google Meet: customer's face tile + call audio
+Live video call (Video KYC / interview / online exam) shared from Google Meet: participant's face tile + call audio
 ```
 
 **System Analysis**
@@ -319,40 +269,37 @@ Risk Level: HIGH (≥ 65: stop the call and escalate)
 
 ## 🧰 Calibrating and Training
 
-**Calibrate on your own KYC recordings.** Put genuine and deepfake recordings from your channel in folders and run:
+**Calibrate on your own recordings** (from your KYC, interview or exam channel):
 
 ```bash
-venv\Scripts\python -m tools.evaluate --real kyc\real --fake kyc\fake --degrade none --calibrate
+venv\Scripts\python -m tools.evaluate --real calib\real --fake calib\fake --degrade none --calibrate
 ```
 
-It prints each check's AUC and the catch / false-alarm counts at the dashboard thresholds, then writes `models/calibration.json`, which the engine loads at start-up. Add `--cross` for a held-out check; use `--real-audio` / `--fake-audio` for voice.
+Prints per-check AUC and catch/false-alarm counts, and writes `models/calibration.json`. Add `--cross` for a held-out check; `--real-audio` / `--fake-audio` for voice.
 
-**Check a single recording** exactly as the live engine would, and optionally log it as labelled evidence:
+**Check a single recording** as the live engine would:
 
 ```bash
 venv\Scripts\python -m tools.check_video "C:\path\video.mp4" --label fake
 venv\Scripts\python -m tools.train_evidence
 ```
 
-**Train our own detectors.** FraudShield can run small classifiers trained on top of frozen pretrained models (XLS-R 300M for Indian-language voice clones, CLIP ViT-L/14 for webcam face deepfakes). Each shows up as its own check, weighted by its held-out AUC. See [TRAINING.md](TRAINING.md).
-
-**Diagnose a setup** (models, GPU, webcam): `venv\Scripts\python -m tools.diagnose`.
+**Train our own detectors** on frozen backbones (XLS-R 300M for Indian-language voice clones, CLIP ViT-L/14 for webcam deepfakes). See [TRAINING.md](TRAINING.md).
 
 ---
 
 ## 🔐 Security & Privacy
 
-* Frames and audio go only to the engine on `localhost`, are analysed in memory (last ~30 s) and are never written to disk.
-* The engine listens on `127.0.0.1` only, and its WebSocket accepts connections only from pages served on `localhost`, so other websites open in the officer's browser can't connect to it.
-* Sharing just the call's browser tab keeps everything else on the officer's screen out of the capture.
-* Once the face is found, only the region around it is streamed to the engine.
-* No accounts, API keys or cloud services: all models run locally.
+* Frames and audio stay on `localhost`, in memory (last ~30 s), never written to disk.
+* The engine listens on `127.0.0.1` and accepts WebSockets only from `localhost` pages.
+* Sharing just the call tab keeps the rest of the screen private; only the face region is streamed once found.
+* No accounts, API keys or cloud services.
 
 ---
 
 ## ⚙️ Performance
 
-FraudShield has to run next to the video call without slowing it down. Measured with a live session (% of one CPU core):
+Measured in a live session (% of one CPU core):
 
 | | Before optimisation | Now |
 |---|---|---|
@@ -360,30 +307,26 @@ FraudShield has to run next to the video call without slowing it down. Measured 
 | Python engine | ~99 % | ~30 % |
 | Frames analysed per second | 11 | 15 |
 
-- **Face-region streaming**: the whole screen is sent only while searching for the customer; otherwise just the face region at native resolution.
-- **Work done once**: per-frame features are computed on arrival; slower checks refresh every 2 s.
-- **GPU without CPU spin**: the face detector replays as a single CUDA graph, and GPU results are awaited without busy-waiting.
-- **No thread storms**: numeric libraries are capped at 2 threads with passive OpenMP waits.
-- **A dashboard that rests**: canvases redraw only when their data changes, and nothing animates in a loop during a session.
+Gains come from face-region-only streaming, computing features once, CUDA-graph face detection without busy-waiting, capped thread pools, and redrawing the dashboard only on data changes.
 
 ---
 
 ## 🔮 Future Scope
 
-* [ ] Calibrate and fine-tune on real KYC-channel recordings
-* [ ] Stronger voice-clone detection for modern commercial TTS and Indian languages
+* [ ] Calibrate and fine-tune on real Video KYC, interview and exam recordings
+* [ ] Stronger voice-clone detection for modern TTS and Indian languages
 * [ ] Re-train the face detector on newer real-time face-swap generators
-* [ ] Integrate directly with bank video-KYC platforms instead of screen capture
-* [ ] HTTPS deployment for remote officers and centralised audit of evidence reports
-* [ ] More liveness challenges (random head-motion paths, lighting changes)
+* [ ] Direct integration with Video KYC, hiring and proctoring platforms
+* [ ] HTTPS deployment and centralised audit of evidence reports
+* [ ] More liveness challenges (random head paths, lighting changes)
 
 ---
 
 ## ⚠️ Honest Limits
 
-- **Deepfake generators move fast.** The face detector is trained on FaceForensics++ / Celeb-DF era face swaps and reenactment, so brand-new generators may evade it until it is re-trained. The liveness challenges are the fallback that breaks most real-time swaps.
+- **Generators move fast**: brand-new face swaps may evade the detector until re-trained; liveness challenges are the fallback.
 - **Voice-clone detection is the weakest part** (see Results).
-- **Poor video lowers detection power.** With a 360p stream or a small tile, the dashboard shows lower confidence instead of guessing.
+- **Poor video lowers detection power**: the dashboard shows lower confidence instead of guessing.
 
 ---
 
@@ -395,7 +338,7 @@ This project was developed as part of **Hackathena '26 2.0**, organized by the *
 
 > **Detection and Prevention of AI-Based Frauds**
 
-The project focuses on addressing emerging forms of fraud enabled or amplified by generative artificial intelligence, including **deepfakes, cloned voices, synthetic media, fabricated documents, and AI-assisted impersonation**.
+The project addresses fraud enabled by generative AI, including **deepfakes, cloned voices, synthetic media and AI-assisted impersonation**.
 
 ---
 
@@ -403,36 +346,30 @@ The project focuses on addressing emerging forms of fraud enabled or amplified b
 
 ```text
 .
-├── app.py                     # FastAPI server: static dashboard + /ws streaming endpoint
-├── web/                       # Dashboard (frontend)
-│   ├── index.html, styles.css, app.js
-│   ├── capture-worker.js      # WebSocket + frame encoder (Web Worker)
-│   └── pcm-worklet.js         # System-audio capture (AudioWorklet)
+├── app.py                     # FastAPI server: dashboard + /ws streaming endpoint
+├── web/                       # Dashboard (index.html, styles.css, app.js, capture-worker.js, pcm-worklet.js)
 ├── modules/                   # Detection engine
-│   ├── live.py                # Per-call session: orchestration, events, challenges
-│   ├── face_module.py         # Screen face finder + face forensics
+│   ├── live.py                # Per-call session orchestration
+│   ├── face_module.py         # Face finder + face forensics
 │   ├── voice_module.py        # Voice forensics
 │   ├── avsync.py              # Lip-sync check
-│   ├── challenge.py           # Read-aloud, hand and side-profile challenges
+│   ├── challenge.py           # Liveness challenges
 │   ├── fusion.py              # Real-time fusion and verdict
-│   ├── scoring.py             # Evidence aggregation (liveness vs. synthesis)
+│   ├── scoring.py             # Liveness vs. synthesis aggregation
 │   ├── calibration.py         # Detector output → risk
 │   ├── evidence.py            # Learned fusion from labelled recordings
-│   └── detectors/             # Face, voice, scene and custom-head detectors
-│       └── deepguard/         # Vendored MS-EffGCViT model code (MIT, see NOTICE.md)
+│   └── detectors/             # Face, voice, scene and custom detectors (deepguard: MIT, see NOTICE.md)
 ├── tools/                     # Evaluation, calibration, training and diagnostics CLIs
-├── models/                    # Downloaded weights + calibration (git-ignored)
+├── models/                    # Weights + calibration (git-ignored)
 ├── data/                      # Training / evidence data (git-ignored)
-├── requirements.txt           # Python dependencies
-├── TRAINING.md                # How to train our own detectors
+├── requirements.txt
+├── TRAINING.md
 └── README.md
 ```
 
 ---
 
 ## 📬 Contact
-
-For questions, collaboration, or further information:
 
 **Team:** n00bmasters
 **Team Lead:** Sreekanth S
