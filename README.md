@@ -301,8 +301,7 @@ Gains come from face-region-only streaming, computing features once, CUDA-graph 
 ## ⚠️ Honest Limits
 
 - **Generators move fast**: brand-new face swaps may evade the detector until re-trained; liveness challenges are the fallback.
-- **Voice-clone detection is the weakest part** (see Results).
-- **Poor video lowers detection power**: the dashboard shows lower confidence instead of guessing.
+- **Poor video lowers detection power**: the dashboard shows lower confidence (82%) instead of guessing.
 
 ---
 
