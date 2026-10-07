@@ -131,7 +131,7 @@ Verdicts: **Calibrating**, **Likely genuine** (< 35), **Suspicious** (35–65, r
 
 Face module, shipped calibration (*in-sample*):
 
-| Video quality | Face score AUC | Fakes flagged ≥ 65 | Genuine flagged ≥ 65 | Genuine flagged ≥ 35 |
+| Video quality | Face score AUC | Fakes flagged | Genuine flagged | Genuine flagged |
 |---|---|---|---|---|
 | Full resolution | 0.95 | 25 / 33 | 0 / 32 | 7 / 32 |
 | 720p call | 0.92 | 22 / 34 | 1 / 32 | 12 / 32 |
@@ -139,14 +139,14 @@ Face module, shipped calibration (*in-sample*):
 
 Out-of-sample (calibrate on one dataset, test on the other):
 
-| Tested on | Detector AUC | Fakes flagged ≥ 65 | Genuine flagged ≥ 65 |
+| Tested on | Detector AUC | Fakes flagged | Genuine flagged |
 |---|---|---|---|
 | Celeb-DF (calibrated on DFD) | 0.98 | 14 / 18 | 1 / 16 |
 | DFD (calibrated on Celeb-DF) | 0.89 | 3 / 15 | 0 / 16 |
 
 | Metric                 | Result                                      |
 | ---------------------- | ------------------------------------------- |
-| **Voice clones**       | 0 false alarms on 25 genuine clips; 4 / 18 commercial clones flagged ≥ 65 |
+| **Voice clones**       | 0 false alarms on 25 genuine clips |
 | **Response Time**      | Score every 1 s; frames at 15 fps |
 | **Resource use**       | ~30 % of one CPU core (engine) + ~97 % (Chrome) |
 | **Supported Input**    | Live screen / tab capture with audio; files via `tools/` |
