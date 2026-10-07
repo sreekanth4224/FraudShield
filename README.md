@@ -178,29 +178,84 @@ What this shows:
 * Optional: an NVIDIA GPU with CUDA
 * A few GB of disk for model weights (downloaded from Hugging Face into `./models`)
 
-### Installation
+### Setup tutorial (one time)
+
+Run these in **Command Prompt** or **PowerShell**.
+
+**1. Get the code**
 
 ```bash
 git clone https://github.com/sreekanth4224/FraudShield.git
 cd FraudShield
+```
 
+**2. Create a virtual environment**
+
+```bash
 py -3.11 -m venv venv
+venv\Scripts\python -m pip install --upgrade pip
+```
+
+**3. Install PyTorch** (pick one)
+
+```bash
+:: NVIDIA GPU (recommended, much faster)
+venv\Scripts\pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu124
+
+:: CPU only
 venv\Scripts\pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+```
+
+Always install torch and torchvision **together from the same index**. A mismatched torchvision breaks the detectors (`operator torchvision::nms does not exist`).
+
+**4. Install the other dependencies**
+
+```bash
 venv\Scripts\pip install -r requirements.txt
+```
+
+**5. Download the model weights** (into `./models`, a few minutes the first time)
+
+```bash
 venv\Scripts\python -m tools.download_models
 ```
 
-With an NVIDIA GPU, install the CUDA builds instead. Install torch and torchvision **together from the same index**, because a mismatched torchvision breaks both detectors (`operator torchvision::nms does not exist`):
+**6. Check the setup** (optional: models, GPU and webcam)
 
 ```bash
-venv\Scripts\pip install torch==2.6.0 torchvision==0.21.0 --index-url https://download.pytorch.org/whl/cu124
+venv\Scripts\python -m tools.diagnose
 ```
 
-If torch or the weights are missing, the app still runs on the forensic checks alone, and the dashboard's **AI models** pill says so.
+### Run the app
 
-### Environment Variables
+```bash
+cd FraudShield
+venv\Scripts\python app.py
+```
 
-None are required. Optional settings:
+The dashboard opens automatically at **http://localhost:8000**. Stop the server with **Ctrl + C**.
+
+Useful options:
+
+```bash
+venv\Scripts\python app.py --port 8080          # use another port
+venv\Scripts\python app.py --no-browser         # don't open the dashboard automatically
+venv\Scripts\python app.py --window full        # dashboard window: right (default) | left | full
+```
+
+Screen capture only works on a secure page, so open the dashboard as `localhost` on the officer's own machine (not via a LAN IP). To reach it from another machine, put the server behind HTTPS.
+
+### Optional settings
+
+No environment variables are required. To change a setting, set it before `python app.py`:
+
+```bash
+:: Command Prompt
+set FRAUDSHIELD_SCENE=0
+
+# PowerShell
+$env:FRAUDSHIELD_SCENE = "0"
+```
 
 ```env
 FRAUDSHIELD_FACE_MODELS=b0-ff++,b0-celeb      # add b5-ff++ for a more compression-robust face model (GPU recommended)
@@ -211,19 +266,16 @@ FRAUDSHIELD_FP32=0                            # 1 disables half precision on GPU
 FRAUDSHIELD_WINDOW=right                      # dashboard window placement: right | left | full
 ```
 
-### Run
+### Troubleshooting
 
-```bash
-venv\Scripts\python app.py
-```
-
-The application will be available at:
-
-```text
-http://localhost:8000
-```
-
-Screen capture only works on a secure page, so open the dashboard as `localhost` on the officer's own machine (not via a LAN IP). To reach it from another machine, put the server behind HTTPS.
+| Problem | Fix |
+|---|---|
+| `py -3.11` not found | Install Python 3.11 from python.org and tick *Add to PATH* |
+| `operator torchvision::nms does not exist` | Reinstall torch and torchvision together from the same index (step 3) |
+| **AI models** pill is not green | Hover over it to see why; usually step 5 was skipped. The app still runs on the forensic checks alone |
+| Share screen does nothing / is blocked | Use Chrome or Edge and open `http://localhost:8000`, not an IP address |
+| No voice score | Tick *Also share tab audio* / *Also share system audio* when sharing |
+| Port 8000 already in use | `venv\Scripts\python app.py --port 8080` |
 
 ### Using it
 

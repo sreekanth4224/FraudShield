@@ -9,6 +9,7 @@ import argparse
 import asyncio
 import json
 import struct
+import sys
 import threading
 import webbrowser
 from concurrent.futures import ThreadPoolExecutor
@@ -221,6 +222,8 @@ def open_dashboard(url, side="right"):
     webbrowser.open(url)
 
 if __name__ == "__main__":
+    for _stream in (sys.stdout, sys.stderr):
+        _stream.reconfigure(encoding="utf-8", errors="replace")
     ap = argparse.ArgumentParser(description="FraudShield Live dashboard")
     ap.add_argument("--host", default="127.0.0.1")
     ap.add_argument("--port", type=int, default=8000)
